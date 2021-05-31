@@ -1,0 +1,11 @@
+{
+  "lambda": {
+    "role": "API-executor",
+    "name": "API",
+    "region": "us-east-1"
+  },
+  "api": {
+    "id": "bmji596238",
+    "module": "app"
+  }
+}

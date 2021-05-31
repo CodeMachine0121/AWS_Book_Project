@@ -1,0 +1,7 @@
+{
+  "lambda": {
+    "role": "firstAPI-executor",
+    "name": "firstAPI",
+    "region": "us-east-1"
+  }
+}
