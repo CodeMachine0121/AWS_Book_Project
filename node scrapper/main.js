@@ -21,7 +21,7 @@ crawler.on('fetchcomplete', function(queueItem, responseBuffer, response){
 
     console.log('url: ', queueItem.url);
     $ = cheerio.load(responseBuffer);
-    var title = $(".qa-header__title").text();
+    var title = $(".qa-header__title").text(); // 這邊要靠搜尋
     console.log('new title: ', title);
     //console.log(queueItem);
 });
