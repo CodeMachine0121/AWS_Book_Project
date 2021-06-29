@@ -150,3 +150,69 @@
     $('.apple').attr('id', 'favorite').html()
     // => <li class="apple" id="favorite">Apple</li>
 ```
+## Puppeteer
+另一個負責抓取網頁hmtl的套件
+- **安裝**: `npm install -s puppeteer`
+### example code
+```javascript=
+    const puppeteer = require('puppeteer');
+    
+    (async()=>{
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+        await page.goto('https://www.google.com.tw');
+        
+        await page.screenshot({path:'google.png'}); // 截圖儲存
+        await browser.close();
+    
+    });
+```
+### 使用 cheerio分析 html
+這裡使用IT幫幫忙來爬
+- 單層分析
+```javascript=
+     const cheerio = require('cheerio');
+     
+     (async()=>{
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+        await page.goto('https://ithelp.ithome.com.tw/questions');
+        
+        let body = await page.content(); // get html
+        let $ = await cheerio.load(body);
+       
+        await $('.qa-list__title').each((i,el)=>{
+            console.log($(el).text()); // 就會一行一行印出標題
+        })
+        await browser.close();
+    });
+```
+- 多層分析
+```javascript=
+     const cheerio = require('cheerio');
+     
+     (async()=>{
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+        await page.goto('https://ithelp.ithome.com.tw/questions');
+        
+        let body = await page.content(); // get html
+        let $ = await cheerio.load(body);
+       
+        await $('.qa-list').each((i,el)=>{
+           // 再用cheerio分析每個區塊
+           let $2 = cheerio.load($(el).html());
+
+           let title = $2('.qa-list__title').text().trim();
+           let brows = $2('.qa-condition__count').text().trim();
+           console.log("title: "+title+'\n瀏覽數: '+brows);
+        })
+        
+        await browser.close();
+    });
+```
+
+
+
+
+
