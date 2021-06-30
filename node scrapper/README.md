@@ -65,9 +65,10 @@
 - ### 函數類
     - 新增抓取條件
     ```javascript=
-        var conditionID = crawler.addFetchCondition(function(queueItem, referrerQueueItem){
-            return queueItem.path.indexOf('/news/') > -1
-        });
+        var conditionID = crawler.addFetchCondition(
+            function(queueItem, referrerQueueItem){
+                return queueItem.path.indexOf('/news/') > -1
+            });
     ```
     or
     ```javascript=
@@ -212,7 +213,75 @@
     });
 ```
 
+## 爬取PTT八卦板實作
+![](https://i.imgur.com/jhkS5ou.png)
+
+- **目標**: 爬取版上文章標題及內文並做儲存
+### Web 爬取器
+```javascript=
+function Web_scrawler(URL){ 
+    let html;
+    (async () => {
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+
+        const cookies = {
+            name : "over18",
+            value : "1",
+            domain : "www.ptt.cc"
+        };
+        await page.setCookie(cookies);
+        
+
+        await page.goto(URL);
+
+        
+    
+        // 撈出_body
+        let body = await page.content();
+    
+        $ = await cheerio.load(body);
+        
+        // 呼叫解析器
+        HTML_Parser($);
+        
+        await browser.close();
+    })();
+     
+}
+}
+```
+:::info
+第7至11行: 設定cookies值; 因為PTT八卦版有18歲限制，所以要設定"over18"為1的cookie。
+
+第12行: 讓page物件把我們寫的cookies設定置browser上。
+
+第25行: 呼叫HTML分析器
 
 
+:::
+### HTML 分析器
+```javascript=
+function HTML_Parser($){
+    
+    $('.r-ent').each((i,el)=>{
+        // 再用cheerio分析每個區塊
+         let $$ = cheerio.load($(el).html());
+         var id = $$('nrec').text().trim();
+         var title = $$('.title').text().trim();
+         console.log(id+" "+title);
+
+         var author = $$('.meta .author').text().trim();
+         var date = $$('.meta .date').text().trim();
+         console.log("posted on "+date+" by "+author);
+         console.log("");
+
+    })
+}
+```
+:::info
+第3行: 將所有html中class為'r-ent'的物件全部撈出來，並且透過for迴圈把每個物件中的詳細資料(編號、標題、作者、發文時間以及該文章超連結)撈出。
+:::
+### URL 管理器
 
 
